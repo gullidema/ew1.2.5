@@ -66,17 +66,19 @@ require_once dirname(__DIR__) . '/includes/header.php';
                                    min="<?= date('Y-m-d') ?>">
                         </div>
 
-                        <div class="time-slots-container">
-                            <h4>Available Time Slots</h4>
-                            <p class="text-muted">Select a date to view available time slots</p>
+                        <div class="form-group">
+                            <label for="start-time" class="form-label">Start Time</label>
+                            <input type="time" id="start-time" name="start_time" class="form-control" required>
                         </div>
 
-                        <input type="hidden" id="start-time" name="start_time" required>
-                        <input type="hidden" id="end-time" name="end_time" required>
-                        <input type="hidden" id="duration" name="duration" value="60">
+                        <div class="form-group">
+                            <label for="end-time" class="form-label">End Time</label>
+                            <input type="time" id="end-time" name="end_time" class="form-control" required>
+                            <small class="form-text text-muted">Default duration is 1 hour</small>
+                        </div>
 
                         <div class="form-group mt-4">
-                            <button type="submit" class="btn btn-primary btn-block" disabled>
+                            <button type="submit" class="btn btn-primary btn-block">
                                 <i class="fas fa-calendar-check"></i> Confirm Booking
                             </button>
                         </div>
@@ -142,50 +144,37 @@ require_once dirname(__DIR__) . '/includes/header.php';
             color: var(--gray-700);
         }
 
-        .time-slots-container {
-            margin-top: var(--space-4);
-        }
-
-        .time-slot-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: var(--space-3);
-            margin-top: var(--space-3);
-        }
-
-        .time-slot {
-            padding: var(--space-2);
-            border: 1px solid var(--gray-300);
-            border-radius: var(--radius-md);
-            text-align: center;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-        }
-
-        .time-slot:hover {
-            border-color: var(--primary);
-            background-color: var(--gray-100);
-        }
-
-        .time-slot.selected {
-            background-color: var(--primary);
-            border-color: var(--primary);
-            color: var(--white);
-        }
-
-        .time-slot.disabled {
-            background-color: var(--gray-100);
-            border-color: var(--gray-200);
-            color: var(--gray-400);
-            cursor: not-allowed;
-        }
-
         @media (max-width: 992px) {
             .booking-container {
                 grid-template-columns: 1fr;
             }
         }
     </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startTimeInput = document.getElementById('start-time');
+            const endTimeInput = document.getElementById('end-time');
+
+            // Update end time when start time changes
+            startTimeInput.addEventListener('change', function() {
+                if (this.value) {
+                    // Parse the start time
+                    const [hours, minutes] = this.value.split(':');
+                    const startDate = new Date();
+                    startDate.setHours(parseInt(hours), parseInt(minutes));
+
+                    // Add one hour for default duration
+                    const endDate = new Date(startDate.getTime() + (60 * 60 * 1000));
+                    
+                    // Format end time
+                    const endHours = endDate.getHours().toString().padStart(2, '0');
+                    const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
+                    endTimeInput.value = `${endHours}:${endMinutes}`;
+                }
+            });
+        });
+    </script>
 
     <!-- Include bookings.js for form handling -->
     <script src="<?= APP_URL ?>/assets/js/bookings.js"></script>
